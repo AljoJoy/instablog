@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-start align-items-center">
+    <div class="text-center">
+        <h3 class="display-4">{{ blog.title }} </h3>
+        <span class=""> Date : {{ blog.created_at| date:"Y-m-d" }}</span>
+         <br>
+        <img src="{{ blog.image.url }}" alt="Blog Image" class="img-fluid float-md-end ms-md-3 mb-2" style="width: 100%; max-width: 520px; height: 320px; object-fit: cover;">
+        <p>{{ blog.content }}</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instablog</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+ <body class="d-flex flex-column h-100">
+     <header>
+         <nav class="d-flex justify-content-between align-items-center p-4 bg-warning">
+             <a href="{% if request.session.is_logged_in %}{% url 'userfeed_view' %}{% else %}{% url 'index' %}{% endif %}" class="navbar-brand fs-3 fw-bold align-self-start text-decoration-none">Instablog</a>
+             {% if request.session.is_logged_in %}
+                 <div class="d-flex align-items-center">
+                     <a href="{% url 'logout_view' %}" class="fs-5 fw-bold mx-2 text-decoration-none text-white">Logout</a>
+                     <a href="{% url  'update_profile_view' %}" class="fs-5 fw-bold mx-2 text-decoration-none text-white">Update Profile</a>
+                     {% if request.session.profile_pic_url %}
+                     <div class="d-flex flex-column justify-content-center align-items-center">
+                        <img src="{{ request.session.profile_pic_url }}" alt="Profile" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                        <div class="fs-5 fw-bold mx-2 text-white">{{ request.session.username }}</div>
+                     </div> 
+                    {% endif %}
+                 </div>
+             {% else %}
+             <div class="d-flex align-items-center">
+                 <a href="{% url 'login_view' %}" class="fs-5 fw-bold mx-2 text-decoration-none text-white">Login</a>
+                 <a href="{% url 'register_view' %}" class="fs-5 fw-bold mx-2 text-decoration-none text-white">Register</a>
+             </div>
+             {% endif %}
+         </nav>
+     </header>
+
+    <main class="flex-shrink-0">
+        {% block content %}
+        <!-- Child templates will insert content here -->
+        {% endblock %}
+    </main>
+
+    <footer class="mt-auto  px-2 py-3 bg-light">
+        <p>&copy; {% now "Y" %} Instablog. All rights reserved.</p>
+    </footer>
+</body>
+</html>

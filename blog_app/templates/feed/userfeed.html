@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center">
+    <div class="text-center">
+        <h1 class="display-4">Instablog</h1>
+        <h3>{{ request.session.is_admin }}</h3>
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="{% url 'view_my_blogs' %}" class="btn btn-secondary mx-2">View my blogs</a>
+            <a href="{% url 'create_new_blog' %}" class="btn btn-primary mx-2">Create new blog</a>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <form class="row g-2 justify-content-center mb-3" method="get" action="{% url 'userfeed_view' %}">
+        <div class="col-12 col-md-6">
+            <input type="text" name="q" class="form-control" placeholder="Search blogs by title" value="{{ q|default:'' }}">
+        </div>
+        <div class="col-12 col-md-auto">
+            <button type="submit" class="btn btn-outline-primary w-100">Search</button>
+        </div>
+    </form>
+
+    <div class="row">
+        {% for blog in other_blogs %}
+            <div class="col-12 col-md-6 col-lg-4 mb-3">
+                <div class="card h-100">
+                    {% if blog.image %}
+                        <img src="{{ blog.image.url }}" class="card-img-top" alt="Blog image" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ blog.title }}</h5>
+                        <p class="card-text mb-1">By {{ blog.author.username }}</p>
+                    </div>
+                    <div>
+                        <form action="{% url 'add_comment' blog.id %}" method="post">
+                            {% csrf_token %}
+                            <textarea name="comment_text" id="comment" cols="30" rows="3" class="form-control mb-2" placeholder="Write a comment..."></textarea>
+                            <button type="submit" class="btn btn-primary">Add Comment</button>
+                        </form>
+                    </div>
+
+                    <div class="card-body pt-2">
+                        {% for comment in blog.comment_set.all %}
+                            <div class="text-start mb-2">
+                                <div class="fw-bold">{{ comment.author.username }}</div>
+                                <div>{{ comment.comment_text }}</div>
+                            </div>
+                        {% empty %}
+                            <div class="text-start text-muted">No comments yet.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">No blogs from other users yet.</div>
+            </div>
+        {% endfor %}
+        {% if page_obj.paginator.num_pages > 1 %}
+        <nav aria-label="Userfeed pagination">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                    <a class="page-link"
+                    href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% else %}#{% endif %}">
+                        Previous
+                    </a>
+                </li>
+
+                {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+
+                <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                    <a class="page-link"
+                    href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% else %}#{% endif %}">
+                        Next
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
